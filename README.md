@@ -1,0 +1,1 @@
+In progress :) See the build steps, the learning process and Gemini output in the [Build Logs](./build-logs.md)
