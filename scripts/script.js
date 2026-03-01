@@ -9,3 +9,8 @@ const StateBuffer = {
     isRunning: false,
     intervalId: null,
 }
+
+// VIEW RENDERER (Our "Mirror")
+const ViewRenderer = {
+    // To be added
+}
