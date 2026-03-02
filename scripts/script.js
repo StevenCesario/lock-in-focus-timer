@@ -58,3 +58,8 @@ const TimeParser = {
         }
     }
 };
+
+// EVENT LOOP
+const TimerEngine = {
+    // To be added
+}
