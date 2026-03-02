@@ -105,5 +105,8 @@ startBtn.addEventListener('click', () => {
 });
 
 // INITIALIZATION
-// When the script first runs, make sure the DOM matches our State
+// When the script first runs, make sure our State and DOM match. Start with the 45:00 from the HTML
+const rawText = timeDisplay.textContent;
+StateBuffer.totalSeconds = TimeParser.parseToSeconds(rawText);
+
 ViewRenderer.updateDisplay();
