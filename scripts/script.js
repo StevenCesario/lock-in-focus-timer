@@ -34,10 +34,6 @@ const ViewRenderer = {
     }
 }
 
-// INITIALIZATION
-// When the script first runs, make sure the DOM matches our State
-ViewRenderer.updateDisplay();
-
 // TIME PARSER (DOM String -> Primitive Integer)
 const TimeParser = {
     parseToSeconds(timeString) {
@@ -107,3 +103,7 @@ startBtn.addEventListener('click', () => {
         TimerEngine.start();
     }
 });
+
+// INITIALIZATION
+// When the script first runs, make sure the DOM matches our State
+ViewRenderer.updateDisplay();
