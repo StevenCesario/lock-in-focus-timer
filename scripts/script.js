@@ -96,8 +96,13 @@ const TimerEngine = {
 };
 
 // INPUT "FIREWALL"
-timeDisplay.addEventListener('keydown', () => {
-    
+timeDisplay.addEventListener('keydown', (e) => {
+    // We want to still allow "control" keys. Without these, the user wouldn't be able 
+    // to fix any potentional mistakes
+    const isControlKey = [
+        'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'
+    ].includes(e.key);
+
 })
 
 // CLICK EVENT
