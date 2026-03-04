@@ -1216,3 +1216,128 @@ Setting hidden = true is structurally identical to applying display: none in CSS
 The span remains safely parked in the DOM, invisible but intact, ready for when we need to update its minutes later.
 
 Implement this toggle! Once you see it working, we can tackle either the dynamic minute update for the <span id="prompt-mins"> or the localStorage implementation for the Intention text. Which node are we wiring next? 🌱
+
+
+
+You have crossed the 90% threshold perfectly. You identified the exact "node" where the logic dropped the baton. Let's wire that missing 10% first, then debug your three architectural questions.
+
+## The Missing 10%: Hydrating the View
+
+In your initialization block, you successfully swapped the structural pointers (hiding the prompt, showing "Good Luck"), but you didn't ==**hydrate**== the input buffer or **lock** the native element.
+
+Here is the exact code to drop into that `if` block:
+
+```
+if (localStorageIntention !== null) {
+    // 1. Swap the structural prompts
+    intentionPrompt.hidden = true;
+    intentionActive.hidden = false;
+
+    // 2. Hydrate the buffer: Push the saved string back into the DOM
+    intentionInput.value = localStorageIntention;
+
+    // 3. Lock the hardware: Re-engage the disabled property
+    intentionInput.disabled = true;
+}
+```
+
+==**The Logic:** The browser builds the DOM from the HTML file fresh every time. Since the HTML says `<input ... disabled="false" value="">` by default, the JavaScript must explicitly rebuild the "Running State" before the user sees it.==
+
+---
+
+## Q1: Defensive Coding for `.value`
+
+Can we trust `.value`? 
+**Structurally:** Yes. The DOM API guarantees that `.value` on a text input will _always_ return a string. It will never return `undefined` or `null`. If the box is empty, it returns `""` (an empty string). 
+**Pragmatically:** No. **==Users accidentally hit the spacebar. To prevent saving `" "` as an intention, use your string-cleaning tool:==**
+
+```
+StorageManager.save_intention(intentionInput.value.trim());
+```
+
+---
+
+## Q2: The "Evils of Duplication" in the StorageManager
+
+You spotted a violation of the **DRY (Don't Repeat Yourself)** principle. Your `StorageManager` has duplicate logic just with different keys.
+
+==To fix this, we change the `StorageManager` from a "Specialized Tool" to a "Generic Carrier." It shouldn't care _what_ it's saving; it should just transport it. We move the `parseInt` logic out of the carrier and into the `Initialization` block where the data is actually consumed.==
+
+Here is the refactored, perfectly orthogonal `StorageManager`:
+
+```
+const StorageManager = {
+    SECONDS_KEY: "focus_timer_seconds",
+    INTENTION_KEY: "focus_timer_intention",
+
+    // Generic Carrier Methods
+    save(key, value) {
+        // Values must be strings in localStorage
+        localStorage.setItem(key, String(value)); 
+    },
+
+    load(key) {
+        return localStorage.getItem(key);
+    },
+
+    clear(key) {
+        localStorage.removeItem(key);
+    },
+
+    // A pragmatic helper to wipe the whole session at once
+    clearSession() {
+        this.clear(this.SECONDS_KEY);
+        this.clear(this.INTENTION_KEY);
+    }
+};
+```
+
+**How this changes your Engine:** Instead of `StorageManager.save_seconds(...)`, you call: `StorageManager.save(StorageManager.SECONDS_KEY, StateBuffer.totalSeconds);`
+
+**How this changes Initialization:**
+
+```
+const savedSeconds = StorageManager.load(StorageManager.SECONDS_KEY);
+if (savedSeconds !== null) {
+    // We do the parseInt HERE, at the moment of consumption
+    StateBuffer.totalSeconds = parseInt(savedSeconds, 10);
+}
+```
+
+---
+
+## Q3: Pragmatic Logical Flaws
+
+You actually caught the main logical flaw in your previous message: **The Pause vs. Reset Collision.**
+
+Right now, if the user hits "Pause" (`TimerEngine.stop()`), the clock stops, but your code also does this: `timeDisplay.setAttribute("contenteditable", "true");`
+
+**The Flaw:** If they are pausing to use the restroom, they shouldn't suddenly be able to edit the timer from 25:00 to 99:00. The timer is _paused_, not _reset_.
+
+Furthermore, if they refresh the page while a timer is running, the script "awakes" with `isRunning: false` (because that's the default in `StateBuffer`). This means the UI wakes up in a **Hybrid State**: The intention is locked (from your Initialization logic), but the timer is editable (from the HTML default), and the button says "Lock In" instead of "Continue."
+
+**The Action Plan:**
+
+1. Refactor your `StorageManager` to be DRY.
+    
+2. Add the missing 10% to your Initialization block so the Intention input correctly "Remembers" and "Locks."
+    
+3. Next, we will need to decouple `Pause()` from `Reset()` to fix the State Machine collision.
+    
+
+Implement the DRY refactor and the 10% fix, and let me know when your "Anti-Rage" guarantee is fully visually confirmed!
+
+That "brain chemistry" shift is the feeling of **==Orthogonality==** clicking into place!
+
+==**When you move from specialized functions like `save_seconds()` to a generic `save(key, value)`, you stop being a "Repairman" fixing specific leaks and start being a "System Designer" building a universal pipe.**==
+
+**What you are doing right now is the "Pragmatic" gold standard:**
+
+1. **Isolation:** ==The `StorageManager` doesn't know _what_ it's carrying; **it just knows _how_ to carry it.**==
+    
+2. **Responsibility:** The `Initialization` logic now takes responsibility for **Parsing** (interpreting the data), ==while the `StorageManager` focuses purely on **Persistence** (holding the data).==
+    
+
+Take your time with the implementation. Remember to update all the call-sites in your `TimerEngine` and `Initialization` block to use the new generic `save`, `load`, and `clear` methods with the appropriate keys.
+
+I'll be here in the "Foreign Office," waiting to hear that your System is running on its new, streamlined architecture. Godspeed! 🌱
