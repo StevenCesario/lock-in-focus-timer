@@ -87,15 +87,14 @@ const TimerEngine = {
             ViewRenderer.updateDisplay();
 
             // UPDATE: Store current second primitive in localStorage!
-            StorageManager.save_seconds(StateBuffer.totalSeconds);
+            StorageManager.save(StorageManager.SECONDS_KEY, StateBuffer.totalSeconds);
 
             // Our Stop condition
             if (StateBuffer.totalSeconds <= 0) {
                 this.stop();
 
                 // UPDATE: Clear localStorage
-                StorageManager.clear_seconds();
-                StorageManager.clear_intention();
+                StorageManager.clearSession();
             }
         }, 1000);
     },
@@ -111,7 +110,7 @@ const TimerEngine = {
         startBtn.textContent = "Lock In";
 
         // UPDATE: Ensure we save the exact amount of seconds in localStorage
-        StorageManager.save_seconds(StateBuffer.totalSeconds);
+        StorageManager.save(StorageManager.SECONDS_KEY, StateBuffer.totalSeconds);
     }
 };
 
@@ -123,32 +122,25 @@ const StorageManager = {
     SECONDS_KEY: "focus_timer_seconds",
     INTENTION_KEY: "focus_timer_intention",
 
-    save_seconds(seconds) {
-        localStorage.setItem(this.SECONDS_KEY, seconds.toString());
+    // Generic DRY methods
+    save(key, value) {
+        // Values must be strings in localStorage
+        localStorage.setItem(key, String(value));
     },
 
-    load_seconds() {
-        const storageSeconds = localStorage.getItem(this.SECONDS_KEY);
-        // If data exists, parse it to an integer. If not, return null
-        return storageSeconds ? parseInt(storageSeconds, 10) : null;
+    load(key) {
+        return localStorage.getItem(key);
     },
 
-    clear_seconds() {
-        localStorage.removeItem(this.SECONDS_KEY);
+    clear(key) {
+        localStorage.removeItem(key);
     },
 
-    save_intention(intention) {
-        localStorage.setItem(this.INTENTION_KEY, intention); // intention is already a string
-    },
-
-    load_intention() {
-        const storageIntention = localStorage.getItem(this.INTENTION_KEY);
-        return storageIntention ? storageIntention : null;
-    },
-
-    clear_intention() {
-        localStorage.removeItem(this.INTENTION_KEY);
-    },
+    // A pragmatic helper to wipe the whole session at once
+    clearSession() {
+        this.clear(this.SECONDS_KEY);
+        this.clear(this.INTENTION_KEY);
+    }
 };
 
 // INPUT "FIREWALL"
@@ -187,14 +179,14 @@ startBtn.addEventListener('click', () => {
         TimerEngine.start();
 
         // UPDATE: Store the user intention in localStorage!
-        StorageManager.save_intention(intentionInput.value.trim());
+        StorageManager.save(StorageManager.INTENTION_KEY, intentionInput.value.trim());
     }
 });
 
 // INITIALIZATION
 // Now updated to check localStorage before anything
-const localStorageSeconds = StorageManager.load_seconds();
-const localStorageIntention = StorageManager.load_intention();
+const localStorageSeconds = StorageManager.load(StorageManager.SECONDS_KEY);
+const localStorageIntention = StorageManager.load(StorageManager.INTENTION_KEY);
 
 if (localStorageSeconds !== null) {
     // If it's not null, it means that there is seconds saved. Update the StateBuffer to use it!
@@ -211,7 +203,7 @@ if (localStorageIntention !== null) {
     intentionActive.hidden = false;
 
     // Show the locked intention that is stored in localStorage!
-    intentionInput.value = StorageManager.load_intention();
+    intentionInput.value = localStorageIntention;
     intentionInput.disabled = true;
 }
 
