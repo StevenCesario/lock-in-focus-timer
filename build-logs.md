@@ -1132,3 +1132,33 @@ When you are ready to write the JavaScript, we will need to:
     
 
 Would you like to build the dynamic "Minute Prompt Updater" first, or handle the "Input Locking" logic? 🌱
+
+
+This is a fantastic "Gap in Intuition" moment! You’ve verified the **Pointer** (the `console.log` shows the element) and the **Protocol** (you see `disabled="true"` in the DOM). So why is the door still open?
+
+In _The Pragmatic Programmer_, there's a concept called **"The Evils of Duplication."** Sometimes, we assume two things work the same way because they _look_ similar, but under the hood, they follow different rules.
+
+## The Clue: Two Different "Species" of Input
+
+Look closely at your two elements:
+
+1. **The Timer (`<div>`):** You used `contenteditable`.
+    
+2. **The Intention (`<input>`):** You used a standard input.
+    
+
+A `<div>` is not naturally an input. To stop a user from typing in it, you have to toggle the **attribute** `contenteditable` between `"true"` and `"false"`.
+
+However, a standard `<input>` is a "Native Resident" of the form world. It doesn't rely on `contenteditable`. It has a special **property** called `disabled`.
+
+## The Direction
+
+When you use `setAttribute('disabled', 'true')`, you are treating the "Lock" like a piece of text written on the door. But for a native `<input>`, the browser is looking for a **Boolean Toggle** on the object itself—not just a string attribute in the HTML.
+
+**The "Pragmatic" Experiment:** Instead of using `setAttribute`, try talking directly to the **Object Property** in your JavaScript.
+
+Think back to your **Contact List** script. When you wanted to "unfreeze" the text fields in the `li`, you didn't use `setAttribute`. What did you do to the `nameInput.disabled` value?
+
+**Check your logic:** If you set a property directly to a **Boolean** (`true` or `false`), the browser's "Native Hardware" will usually respond much more reliably than if you pass it a string via `setAttribute`.
+
+Does that spark a connection to how you handled the "Ändra" (Edit) button in your previous project? 🌱

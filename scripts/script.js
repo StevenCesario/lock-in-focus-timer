@@ -1,6 +1,7 @@
 // DOM POINTERS
 const timeDisplay = document.getElementById('time-display');
 const startBtn = document.getElementById('start-btn');
+const intentionInput = document.getElementById('intention-input');
 
 // STATE BUFFER (Our Source of Truth)
 // Time is stored purely as an integer representing seconds. Raw, primitive data
@@ -70,6 +71,10 @@ const TimerEngine = {
         timeDisplay.setAttribute("contenteditable", "false");
         StateBuffer.isRunning = true;
         startBtn.textContent = "Pause";
+
+        // UPDATE: Lock the text input field!
+        intentionInput.disabled = true;
+        // console.log("intentionInput: ", intentionInput);
 
         // 3. The "Heartbeat" using setInterval
         StateBuffer.intervalId = setInterval(() => {
