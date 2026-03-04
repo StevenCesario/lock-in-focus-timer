@@ -1,6 +1,7 @@
 // DOM POINTERS
 const timeDisplay = document.getElementById('time-display');
 const startBtn = document.getElementById('start-btn');
+const resetBtn = document.getElementById('reset-btn');
 const intentionInput = document.getElementById('intention-input');
 const intentionPrompt = document.getElementById('intention-prompt');
 const intentionActive = document.getElementById('intention-active');
@@ -180,6 +181,9 @@ startBtn.addEventListener('click', () => {
 
         // UPDATE: Store the user intention in localStorage!
         StorageManager.save(StorageManager.INTENTION_KEY, intentionInput.value.trim());
+
+        // UPDATE: Show the Reset button!
+        resetBtn.hidden = false;
     }
 });
 
