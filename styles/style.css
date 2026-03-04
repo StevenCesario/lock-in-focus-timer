@@ -65,3 +65,47 @@ body {
 .control-btn:active {
     transform: scale(0.98);
 }
+
+/* ==========================================
+   Intention UI
+   ========================================== */
+.intention-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 500px; /* Prevents the input from stretching too far on wide screens */
+}
+
+.intention-prompt {
+    font-size: 1.1rem;
+    color: #a0a0a0; /* A muted gray to keep hierarchy focused on the timer */
+    text-align: center;
+}
+
+.intention-input {
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid #333;
+    color: #f2f2f2;
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 0.5rem;
+    font-family: inherit;
+    transition: border-bottom 0.2s ease-in-out;
+}
+
+/* Structural feedback when the user is actively typing their intention */
+.intention-input:focus {
+    outline: none;
+    border-bottom: 2px solid #888;
+}
+
+/* The "Locked" state (to be triggered by JS later) */
+.intention-input:disabled {
+    color: #555;
+    border-bottom: 2px solid transparent;
+    cursor: not-allowed;
+}

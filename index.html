@@ -12,8 +12,24 @@
         <div id="time-display" class="time-display" contenteditable="true" spellcheck="false">
             45:00
         </div>
-        <!-- TODO in JS: Build a "Custom Firewall" that intercepts letters using keydown events
-         and e.preventDefault() -->
+
+        <div class="intention-container">
+            <label for="intention-input" id="intention-prompt" class="intention-prompt">
+                What is your intention for these <span id="prompt-mins">45</span> minutes?
+            </label>
+            <label for="intention-input" id="intention-active" class="intention-prompt" hidden>
+                Good Luck! 🌱✨
+            </label>
+            
+            <input 
+                type="text" 
+                id="intention-input" 
+                class="intention-input" 
+                placeholder="e.g., Complete the first 3 exercises of..."
+                autocomplete="off"
+                spellcheck="false"
+            >
+        </div>
         
         <button id="start-btn" class="control-btn">Lock In</button>
     </main>

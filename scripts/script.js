@@ -1,6 +1,9 @@
 // DOM POINTERS
 const timeDisplay = document.getElementById('time-display');
 const startBtn = document.getElementById('start-btn');
+const intentionInput = document.getElementById('intention-input');
+const intentionPrompt = document.getElementById('intention-prompt');
+const intentionActive = document.getElementById('intention-active');
 
 // STATE BUFFER (Our Source of Truth)
 // Time is stored purely as an integer representing seconds. Raw, primitive data
@@ -71,20 +74,27 @@ const TimerEngine = {
         StateBuffer.isRunning = true;
         startBtn.textContent = "Pause";
 
+        // UPDATE: Lock the text input field!
+        intentionInput.disabled = true;
+
+        // UPDATE: Swap the intention prompts
+        intentionPrompt.hidden = true;
+        intentionActive.hidden = false;
+
         // 3. The "Heartbeat" using setInterval
         StateBuffer.intervalId = setInterval(() => {
             StateBuffer.totalSeconds--;
             ViewRenderer.updateDisplay();
 
             // UPDATE: Store current second primitive in localStorage!
-            StorageManager.save(StateBuffer.totalSeconds);
+            StorageManager.save(StorageManager.SECONDS_KEY, StateBuffer.totalSeconds);
 
             // Our Stop condition
             if (StateBuffer.totalSeconds <= 0) {
                 this.stop();
 
                 // UPDATE: Clear localStorage
-                StorageManager.clear();
+                StorageManager.clearSession();
             }
         }, 1000);
     },
@@ -100,28 +110,36 @@ const TimerEngine = {
         startBtn.textContent = "Lock In";
 
         // UPDATE: Ensure we save the exact amount of seconds in localStorage
-        StorageManager.save(StateBuffer.totalSeconds);
+        StorageManager.save(StorageManager.SECONDS_KEY, StateBuffer.totalSeconds);
     }
 };
 
 // LOCALSTORAGE
 // Helper object to handle the string <-> integer conversion
+// UPDATE: Now also handles the key for the user intention
 const StorageManager = {
-    // The key we'll use in localStorage
-    KEY: "focus_timer_seconds",
+    // UPDATE: One localStorage key for the seconds, one for the intention
+    SECONDS_KEY: "focus_timer_seconds",
+    INTENTION_KEY: "focus_timer_intention",
 
-    save(seconds) {
-        localStorage.setItem(this.KEY, seconds.toString());
+    // Generic DRY methods
+    save(key, value) {
+        // Values must be strings in localStorage
+        localStorage.setItem(key, String(value));
     },
 
-    load() {
-        const storageData = localStorage.getItem(this.KEY);
-        // If data exists, parse it to an integer. If not, return null
-        return storageData ? parseInt(storageData, 10) : null;
+    load(key) {
+        return localStorage.getItem(key);
     },
 
-    clear() {
-        localStorage.removeItem(this.KEY);
+    clear(key) {
+        localStorage.removeItem(key);
+    },
+
+    // A pragmatic helper to wipe the whole session at once
+    clearSession() {
+        this.clear(this.SECONDS_KEY);
+        this.clear(this.INTENTION_KEY);
     }
 };
 
@@ -159,20 +177,34 @@ startBtn.addEventListener('click', () => {
         TimerEngine.stop();
     } else {
         TimerEngine.start();
+
+        // UPDATE: Store the user intention in localStorage!
+        StorageManager.save(StorageManager.INTENTION_KEY, intentionInput.value.trim());
     }
 });
 
 // INITIALIZATION
 // Now updated to check localStorage before anything
-const localStorageData = StorageManager.load();
+const localStorageSeconds = StorageManager.load(StorageManager.SECONDS_KEY);
+const localStorageIntention = StorageManager.load(StorageManager.INTENTION_KEY);
 
-if (localStorageData !== null) {
+if (localStorageSeconds !== null) {
     // If it's not null, it means that there is seconds saved. Update the StateBuffer to use it!
-    StateBuffer.totalSeconds = localStorageData;
+    StateBuffer.totalSeconds = localStorageSeconds;
 } else {
     // Start with the 45:00 from the HTML that we had earlier
     const rawText = timeDisplay.textContent;
     StateBuffer.totalSeconds = TimeParser.parseToSeconds(rawText);
+}
+
+if (localStorageIntention !== null) {
+    // Don't show the intention promp, show the Good Luck message immediately!
+    intentionPrompt.hidden = true;
+    intentionActive.hidden = false;
+
+    // Show the locked intention that is stored in localStorage!
+    intentionInput.value = localStorageIntention;
+    intentionInput.disabled = true;
 }
 
 // Ensure the View matches our Source of Truth
