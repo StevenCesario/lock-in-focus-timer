@@ -101,10 +101,7 @@ const TimerEngine = {
     },
 
     pause() {
-        // Halt the Browser API from sending more tasks to the Task Queue
-        clearInterval(StateBuffer.intervalId);
-        StateBuffer.intervalId = null;
-        StateBuffer.isRunning = false;
+        this.haltBrowserAPI();
 
         // UPDATE: Refined Pause button behavior. No editing and "Continue" as the new text
         startBtn.textContent = "Continue";
@@ -114,7 +111,14 @@ const TimerEngine = {
     },
 
     reset() {
-        // To be added
+        this.haltBrowserAPI();
+    },
+
+    haltBrowserAPI() {
+        // Halt the Browser API from sending more tasks to the Task Queue
+        clearInterval(StateBuffer.intervalId);
+        StateBuffer.intervalId = null;
+        StateBuffer.isRunning = false;
     }
 };
 
