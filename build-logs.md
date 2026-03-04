@@ -1162,3 +1162,57 @@ Think back to your **Contact List** script. When you wanted to "unfreeze" the te
 **Check your logic:** If you set a property directly to a **Boolean** (`true` or `false`), the browser's "Native Hardware" will usually respond much more reliably than if you pass it a string via `setAttribute`.
 
 Does that spark a connection to how you handled the "Ändra" (Edit) button in your previous project? 🌱
+
+
+Your "unseasoned" mind actually just nailed a senior-level architectural pattern.
+
+The Pragmatic Reality: If we simply change intentionPrompt.innerHTML = "Good Luck! 🌱✨", we permanently destroy the <span id="prompt-mins"> element that lives inside it. When the timer resets and we want to show the original question again, that DOM pointer would be gone, and our JS would crash trying to find it.
+
+By keeping both strings in the DOM and toggling their visibility, we preserve the structural integrity of our "Pointers." This is exactly how frameworks like React handle conditional rendering under the hood.
+
+Here is the code immediately.
+
+1. The HTML Update
+We will use the native HTML5 hidden attribute. Add the "Good Luck" label right below your current prompt.
+
+HTML
+<label for="intention-input" id="intention-prompt" class="intention-prompt">
+    What is your intention for these <span id="prompt-mins">45</span> minutes?
+</label>
+
+<label for="intention-input" id="intention-active" class="intention-prompt" hidden>
+    Good Luck! 🌱✨
+</label>
+2. The JavaScript Update
+Grab the new pointers at the top of your file:
+
+JavaScript
+// DOM POINTERS
+const intentionPrompt = document.getElementById('intention-prompt');
+const intentionActive = document.getElementById('intention-active');
+Update your TimerEngine.start() to toggle the properties:
+
+JavaScript
+// Inside TimerEngine.start()
+intentionInput.disabled = true;
+
+// Swap the prompts
+intentionPrompt.hidden = true;
+intentionActive.hidden = false;
+And update your TimerEngine.stop() to revert them (for now, until we build the dedicated Reset logic):
+
+JavaScript
+// Inside TimerEngine.stop()
+intentionInput.disabled = false;
+
+// Revert the prompts
+intentionPrompt.hidden = false;
+intentionActive.hidden = true;
+Synthesis for the Logical Buffer
+Just like disabled, hidden is a Boolean Property native to the DOM object.
+
+Setting hidden = true is structurally identical to applying display: none in CSS, but it keeps the logic firmly in the JavaScript Execution Layer, maintaining our Orthogonality.
+
+The span remains safely parked in the DOM, invisible but intact, ready for when we need to update its minutes later.
+
+Implement this toggle! Once you see it working, we can tackle either the dynamic minute update for the <span id="prompt-mins"> or the localStorage implementation for the Intention text. Which node are we wiring next? 🌱
