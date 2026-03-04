@@ -92,7 +92,7 @@ const TimerEngine = {
 
             // Our Stop condition
             if (StateBuffer.totalSeconds <= 0) {
-                this.stop();
+                this.pause();
 
                 // UPDATE: Clear localStorage
                 StorageManager.clearSession();
@@ -100,17 +100,21 @@ const TimerEngine = {
         }, 1000);
     },
 
-    stop() {
+    pause() {
         // Halt the Browser API from sending more tasks to the Task Queue
         clearInterval(StateBuffer.intervalId);
         StateBuffer.intervalId = null;
         StateBuffer.isRunning = false;
 
-        // UPDATED: Refined Pause button behavior. No editing and "Continue" as the new text
+        // UPDATE: Refined Pause button behavior. No editing and "Continue" as the new text
         startBtn.textContent = "Continue";
 
         // UPDATE: Ensure we save the exact amount of seconds in localStorage
         StorageManager.save(StorageManager.SECONDS_KEY, StateBuffer.totalSeconds);
+    },
+
+    reset() {
+        // To be added
     }
 };
 
@@ -174,7 +178,7 @@ timeDisplay.addEventListener('keydown', (e) => {
 // CLICK EVENT
 startBtn.addEventListener('click', () => {
     if (StateBuffer.isRunning) {
-        TimerEngine.stop();
+        TimerEngine.pause();
     } else {
         TimerEngine.start();
 
