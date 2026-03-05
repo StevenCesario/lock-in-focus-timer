@@ -5,6 +5,7 @@ const resetBtn = document.getElementById('reset-btn');
 const intentionInput = document.getElementById('intention-input');
 const intentionPrompt = document.getElementById('intention-prompt');
 const intentionActive = document.getElementById('intention-active');
+const intentionEnd = document.getElementById('intention-end');
 
 // STATE BUFFER (Our Source of Truth)
 // Time is stored purely as an integer representing seconds. Raw, primitive data
@@ -92,7 +93,11 @@ const TimerEngine = {
 
             // Our Stop condition
             if (StateBuffer.totalSeconds <= 0) {
-                this.pause();
+                this.haltBrowserAPI();
+
+                // Swap the intention prompts from active to end
+                intentionActive.hidden = true;
+                intentionEnd.hidden = false;
 
                 // UPDATE: Clear localStorage
                 StorageManager.clearSession();
