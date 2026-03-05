@@ -112,10 +112,19 @@ const TimerEngine = {
 
     reset() {
         if(confirm("Are you sure you want to completely reset the timer?")) {
-            // Simply halt the Browser API and clear the session
             this.haltBrowserAPI();
             StorageManager.clearSession();
-            console.log("Point reached!");
+            
+            // Manual DOM reset
+            timeDisplay.textContent = "45:00";
+            StateBuffer.totalSeconds = 2700;
+            timeDisplay.setAttribute("contenteditable", "true");
+            intentionInput.value = "";
+            intentionInput.disabled = false;
+            intentionPrompt.hidden = false;
+            intentionActive.hidden = true;
+            resetBtn.hidden = true;
+            startBtn.textContent = "Lock In";
         }
     },
 
