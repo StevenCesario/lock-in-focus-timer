@@ -126,22 +126,20 @@ const TimerEngine = {
     },
 
     reset() {
-        if(confirm("Are you sure you want to completely reset the timer?")) {
-            this.haltBrowserAPI();
-            StorageManager.clearSession();
-            
-            // Manual full DOM reset
-            timeDisplay.textContent = "45:00";
-            StateBuffer.totalSeconds = 2700;
-            timeDisplay.setAttribute("contenteditable", "true");
-            intentionInput.value = "";
-            intentionInput.disabled = false;
-            intentionPrompt.hidden = false;
-            intentionActive.hidden = true;
-            intentionEnd.hidden = true;
-            resetBtn.classList.add('invisible'); // UPDATE: Use invisible class instead of hidden property
-            startBtn.textContent = "Lock In";
-        }
+        this.haltBrowserAPI();
+        StorageManager.clearSession();
+        
+        // Manual full DOM reset
+        timeDisplay.textContent = "45:00";
+        StateBuffer.totalSeconds = 2700;
+        timeDisplay.setAttribute("contenteditable", "true");
+        intentionInput.value = "";
+        intentionInput.disabled = false;
+        intentionPrompt.hidden = false;
+        intentionActive.hidden = true;
+        intentionEnd.hidden = true;
+        resetBtn.classList.add('invisible'); // UPDATE: Use invisible class instead of hidden property
+        startBtn.textContent = "Lock In";
     },
 
     haltBrowserAPI() {
@@ -229,7 +227,9 @@ startBtn.addEventListener('click', () => {
 });
 
 resetBtn.addEventListener('click', () => {
-    TimerEngine.reset();
+    if(confirm("Are you sure you want to completely reset the timer?")) {
+        TimerEngine.reset();
+    }
 });
 
 // INITIALIZATION
