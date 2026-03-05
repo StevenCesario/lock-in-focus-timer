@@ -115,6 +115,7 @@ const TimerEngine = {
             // Simply halt the Browser API and clear the session
             this.haltBrowserAPI();
             StorageManager.clearSession();
+            console.log("Point reached!");
         }
     },
 
@@ -183,7 +184,7 @@ timeDisplay.addEventListener('keydown', (e) => {
 });
 
 
-// CLICK EVENT
+// CLICK EVENTS
 startBtn.addEventListener('click', () => {
     if (StateBuffer.isRunning) {
         TimerEngine.pause();
@@ -197,6 +198,8 @@ startBtn.addEventListener('click', () => {
         resetBtn.hidden = false;
     }
 });
+
+resetBtn.addEventListener('click', TimerEngine.reset);
 
 // INITIALIZATION
 // Now updated to check localStorage before anything
