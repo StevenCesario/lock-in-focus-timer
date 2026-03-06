@@ -12,13 +12,17 @@ Core functionality:
 * What should happen when the timer reaches 00:00? CHECK
 
 Bugs:
-* Don't allow an empty intention
-* At least 3 characters for the intention
-* Preventing more than two numbers on either side of the colon?
-* Pressing "Lock In" with an invalid timer or intention shouldn't reveal the Reset Button
+* Don't allow an empty intention CHECK
+* At least 3 characters for the intention CHECK
+    Digits validation:
+    * Preventing more than two numbers on either side of the colon?
+    * Do we parse or validate the digits first?
+    * Move `if (StateBuffer.totalSeconds <= 0) return;` to Validator.validateDigits?
+* Pressing "Lock In" with an invalid timer or intention shouldn't reveal the Reset Button CHECK
 
 UX improvements:
 * Have everything else not "jump up" and cause visual whiplash as the Reset timer is shown CHECK
+* Remove the visual whiplash that has been re-introduced with the error message haha
 * If there is no blur on the timeDisplay and the user hits Enter again, start the timer
 * timeDisplay.blur(); // Remove focus from the element Add focus to ther timer upon initialization
 * Make the two buttons the same width regardless what mode we're in

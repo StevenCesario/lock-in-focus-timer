@@ -6,6 +6,7 @@ const intentionInput = document.getElementById('intention-input');
 const intentionPrompt = document.getElementById('intention-prompt');
 const intentionActive = document.getElementById('intention-active');
 const intentionEnd = document.getElementById('intention-end');
+const errorMessage = document.getElementById('error-message');
 
 // STATE BUFFER (Our Source of Truth)
 // Time is stored purely as an integer representing seconds. Raw, primitive data
@@ -37,6 +38,37 @@ const ViewRenderer = {
     // Push the new state to the DOM
     updateDisplay() {
         timeDisplay.textContent = this.formatTime(StateBuffer.totalSeconds);
+    }
+}
+
+// VALIDATOR
+const Validator = {
+    // Rule: At least 3 characters for now. Will very most likely be updated!
+    validateIntention(intention) {
+        const cleanIntention = intention.trim();
+
+        const intentionRegex = /^.{3,}$/;
+        if (!intentionRegex.test(cleanIntention)) {
+            return "Please enter a valid intention";
+        }
+        return null; // No error
+    },
+
+    // Rule: ?
+    validateDigits(digits) {
+        // To be added
+        return null;
+    },
+
+    // A helper to check both at once
+    validateInput(digits, intention) {
+        const digitsError = this.validateDigits(digits);
+        if (digitsError) return digitsError;
+
+        const intentionError = this.validateIntention(intention);
+        if (intentionError) return intentionError;
+
+        return null; // Both are valid!
     }
 }
 
@@ -96,11 +128,24 @@ const TimeParser = {
 const TimerEngine = {
     start() {
         // 1. Scrape the current string from the DOM and update our Source of Truth
-        const rawText = timeDisplay.textContent;
-        StateBuffer.totalSeconds = TimeParser.parseToSeconds(rawText);
+        const rawDigits = timeDisplay.textContent;
+
+        // TODO: Validate the raw input digits before updating the StateBuffer
+        StateBuffer.totalSeconds = TimeParser.parseToSeconds(rawDigits);
 
         // Safety check: Don't start a zero-second timer
-        if (StateBuffer.totalSeconds <= 0) return;
+        if (StateBuffer.totalSeconds <= 0) return; // To be moved to Validator?
+
+        // UPDATE: Also scrape the Intention input field! And validate it with our new Validator
+        const rawIntention = intentionInput.value;
+        const validatedIntention = Validator.validateIntention(rawIntention);
+
+        // I'd like to believe that we can mash all validation here
+        if (validatedIntention !== null) {
+            errorMessage.classList.remove('invisible'); // Brain chemistry altering: this one should NOT be toggle! Upon repeated invalid input, the error message would toggle rather than being static and standing its ground!
+            errorMessage.textContent = validatedIntention;
+            return;
+        } 
 
         // 2. Lock the buffer! We don't want the user to be able to edit anything 
         // while the timer is running
@@ -111,9 +156,19 @@ const TimerEngine = {
         // UPDATE: Lock the text input field!
         intentionInput.disabled = true;
 
+        // UPDATE: Show the Reset button! Now using the invisible class rather than the hidden property
+        resetBtn.classList.toggle('invisible');
+
         // UPDATE: Swap the intention prompts
         intentionPrompt.hidden = true;
         intentionActive.hidden = false;
+
+        // UPDATE: Store the user intention in localStorage!
+        StorageManager.save(StorageManager.INTENTION_KEY, intentionInput.value.trim());
+
+        // UPDATE: Hide and reset the error message
+        errorMessage.classList.toggle('invisible');
+        errorMessage.textContent = '';
 
         // 3. The "Heartbeat" using setInterval
         StateBuffer.intervalId = setInterval(() => {
@@ -135,7 +190,7 @@ const TimerEngine = {
                 startBtn.textContent = "Set New Intention";
 
                 // Hide the Reset button
-                resetBtn.classList.add('invisible');
+                resetBtn.classList.toggle('invisible');
 
                 // Use our new intentionEndScreen bool in StateBuffer!
                 StateBuffer.intentionEndScreen = true;
@@ -172,7 +227,7 @@ const TimerEngine = {
         intentionPrompt.hidden = false;
         intentionActive.hidden = true;
         intentionEnd.hidden = true;
-        resetBtn.classList.add('invisible'); // UPDATE: Use invisible class instead of hidden property
+        resetBtn.classList.toggle('invisible'); // UPDATE: Use invisible class instead of hidden property
         startBtn.textContent = "Lock In";
     },
 
@@ -255,12 +310,6 @@ startBtn.addEventListener('click', () => {
             StateBuffer.intentionEndScreen = false;
         } else {
             TimerEngine.start();
-    
-            // UPDATE: Store the user intention in localStorage!
-            StorageManager.save(StorageManager.INTENTION_KEY, intentionInput.value.trim());
-    
-            // UPDATE: Show the Reset button! Now using the invisible class rather than the hidden property
-            resetBtn.classList.remove('invisible');
         }
     }
 });
@@ -281,8 +330,8 @@ if (localStorageSeconds !== null) {
     StateBuffer.totalSeconds = localStorageSeconds;
 } else {
     // Start with the 45:00 from the HTML that we had earlier
-    const rawText = timeDisplay.textContent;
-    StateBuffer.totalSeconds = TimeParser.parseToSeconds(rawText);
+    const rawDigits = timeDisplay.textContent;
+    StateBuffer.totalSeconds = TimeParser.parseToSeconds(rawDigits);
 }
 
 if (localStorageIntention !== null) {
