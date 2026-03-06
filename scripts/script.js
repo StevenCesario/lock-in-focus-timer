@@ -343,6 +343,10 @@ if (localStorageIntention !== null) {
     // Show the locked intention that is stored in localStorage!
     intentionInput.value = localStorageIntention;
     intentionInput.disabled = true;
+
+    // I will just chuck the button logic here for now. Refactoring to be made later, I will just make something functional now
+    startBtn.textContent = "Continue";
+    resetBtn.classList.remove('invisible');
 }
 
 // Ensure the View matches our Source of Truth
