@@ -42,7 +42,33 @@ const ViewRenderer = {
 
 // VALIDATOR
 const Validator = {
-    // To be added
+    // Rule: At least 3 characters for now. Will very most likely be updated!
+    validateIntention(intention) {
+        const cleanIntention = intention.trim();
+
+        const intentionRegex = /^.{3,}$/;
+        if (!intentionRegex.test(cleanIntention)) {
+            return "Please enter a valid intention";
+        }
+        return null; // No error
+    },
+
+    // Rule: ?
+    validateDigits(digits) {
+        // To be added
+        return null;
+    },
+
+    // A helper to check both at once
+    validateInput(digits, intention) {
+        const digitsError = this.validateDigits(digits);
+        if (digitsError) return digitsError;
+
+        const intentionError = this.validateIntention(intention);
+        if (intentionError) return intentionError;
+
+        return null; // Both are valid!
+    }
 }
 
 // AUDIO ENGINE
