@@ -40,6 +40,11 @@ const ViewRenderer = {
     }
 }
 
+// VALIDATOR
+const Validator = {
+    // To be added
+}
+
 // AUDIO ENGINE
 const AudioEngine = {
     playDing() {
