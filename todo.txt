@@ -14,7 +14,10 @@ Core functionality:
 Bugs:
 * Don't allow an empty intention
 * At least 3 characters for the intention
-* Preventing more than two numbers on either side of the colon?
+    Digits validation:
+    * Preventing more than two numbers on either side of the colon?
+    * Do we parse or validate the digits first?
+    * Move `if (StateBuffer.totalSeconds <= 0) return;` to Validator.validateDigits?
 * Pressing "Lock In" with an invalid timer or intention shouldn't reveal the Reset Button
 
 UX improvements:

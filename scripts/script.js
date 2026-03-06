@@ -6,6 +6,7 @@ const intentionInput = document.getElementById('intention-input');
 const intentionPrompt = document.getElementById('intention-prompt');
 const intentionActive = document.getElementById('intention-active');
 const intentionEnd = document.getElementById('intention-end');
+const errorMessage = document.getElementById('error-message');
 
 // STATE BUFFER (Our Source of Truth)
 // Time is stored purely as an integer representing seconds. Raw, primitive data
@@ -127,11 +128,24 @@ const TimeParser = {
 const TimerEngine = {
     start() {
         // 1. Scrape the current string from the DOM and update our Source of Truth
-        const rawText = timeDisplay.textContent;
-        StateBuffer.totalSeconds = TimeParser.parseToSeconds(rawText);
+        const rawDigits = timeDisplay.textContent;
+
+        // TODO: Validate the raw input digits before updating the StateBuffer
+        StateBuffer.totalSeconds = TimeParser.parseToSeconds(rawDigits);
 
         // Safety check: Don't start a zero-second timer
-        if (StateBuffer.totalSeconds <= 0) return;
+        if (StateBuffer.totalSeconds <= 0) return; // To be moved to Validator?
+
+        // UPDATE: Also scrape the Intention input field! And validate it with our new Validator
+        const rawIntention = intentionInput.value;
+        const validatedIntention = Validator.validateIntention(rawIntention);
+
+        // I'd like to believe that we can mash all validation here
+        if (validatedIntention !== null) {
+            errorMessage.classList.toggle('invisible');
+            errorMessage.textContent = validatedIntention;
+            return;
+        } 
 
         // 2. Lock the buffer! We don't want the user to be able to edit anything 
         // while the timer is running
@@ -145,6 +159,10 @@ const TimerEngine = {
         // UPDATE: Swap the intention prompts
         intentionPrompt.hidden = true;
         intentionActive.hidden = false;
+
+        // UPDATE: Hide and reset the error message
+        errorMessage.classList.toggle('invisible');
+        errorMessage.textContent = '';
 
         // 3. The "Heartbeat" using setInterval
         StateBuffer.intervalId = setInterval(() => {
@@ -312,8 +330,8 @@ if (localStorageSeconds !== null) {
     StateBuffer.totalSeconds = localStorageSeconds;
 } else {
     // Start with the 45:00 from the HTML that we had earlier
-    const rawText = timeDisplay.textContent;
-    StateBuffer.totalSeconds = TimeParser.parseToSeconds(rawText);
+    const rawDigits = timeDisplay.textContent;
+    StateBuffer.totalSeconds = TimeParser.parseToSeconds(rawDigits);
 }
 
 if (localStorageIntention !== null) {
