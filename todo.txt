@@ -19,6 +19,10 @@ Bugs:
     * Do we parse or validate the digits first?
     * Move `if (StateBuffer.totalSeconds <= 0) return;` to Validator.validateDigits?
 * Pressing "Lock In" with an invalid timer or intention shouldn't reveal the Reset Button CHECK
+* Entering a valid intention has revealed some initialization logic flaws:
+    * The Start Button shouldn't say "Lock In", it should say "Continue" CHECK
+    * The Reset button should be visible! CHECK
+* classList.toggle introduced a new bug: The Reset button is now fading in and out of existence at random. It needs strict remove and add
 
 UX improvements:
 * Have everything else not "jump up" and cause visual whiplash as the Reset timer is shown CHECK
@@ -27,3 +31,6 @@ UX improvements:
 * timeDisplay.blur(); // Remove focus from the element Add focus to ther timer upon initialization
 * Make the two buttons the same width regardless what mode we're in
 * Smooth transitions when the text is changed and the second button is shown
+
+Refactoring:
+* Initialization; see comment in PR #12

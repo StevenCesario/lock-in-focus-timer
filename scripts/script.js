@@ -325,6 +325,7 @@ resetBtn.addEventListener('click', () => {
 const localStorageSeconds = StorageManager.load(StorageManager.SECONDS_KEY);
 const localStorageIntention = StorageManager.load(StorageManager.INTENTION_KEY);
 
+// TODO: We need to change some stuff around here to ensure the logic is sound
 if (localStorageSeconds !== null) {
     // If it's not null, it means that there is seconds saved. Update the StateBuffer to use it!
     StateBuffer.totalSeconds = localStorageSeconds;
@@ -342,6 +343,10 @@ if (localStorageIntention !== null) {
     // Show the locked intention that is stored in localStorage!
     intentionInput.value = localStorageIntention;
     intentionInput.disabled = true;
+
+    // I will just chuck the button logic here for now. Refactoring to be made later, I will just make something functional now
+    startBtn.textContent = "Continue";
+    resetBtn.classList.remove('invisible');
 }
 
 // Ensure the View matches our Source of Truth
