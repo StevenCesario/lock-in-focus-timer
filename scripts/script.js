@@ -163,6 +163,9 @@ const TimerEngine = {
         intentionPrompt.hidden = true;
         intentionActive.hidden = false;
 
+        // UPDATE: Store the user intention in localStorage!
+        StorageManager.save(StorageManager.INTENTION_KEY, intentionInput.value.trim());
+
         // UPDATE: Hide and reset the error message
         errorMessage.classList.toggle('invisible');
         errorMessage.textContent = '';
@@ -307,9 +310,6 @@ startBtn.addEventListener('click', () => {
             StateBuffer.intentionEndScreen = false;
         } else {
             TimerEngine.start();
-    
-            // UPDATE: Store the user intention in localStorage!
-            StorageManager.save(StorageManager.INTENTION_KEY, intentionInput.value.trim());
         }
     }
 });
