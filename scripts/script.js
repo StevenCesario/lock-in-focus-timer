@@ -325,6 +325,7 @@ resetBtn.addEventListener('click', () => {
 const localStorageSeconds = StorageManager.load(StorageManager.SECONDS_KEY);
 const localStorageIntention = StorageManager.load(StorageManager.INTENTION_KEY);
 
+// TODO: We need to change some stuff around here to ensure the logic is sound
 if (localStorageSeconds !== null) {
     // If it's not null, it means that there is seconds saved. Update the StateBuffer to use it!
     StateBuffer.totalSeconds = localStorageSeconds;
