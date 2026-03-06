@@ -19,6 +19,9 @@ Bugs:
     * Do we parse or validate the digits first?
     * Move `if (StateBuffer.totalSeconds <= 0) return;` to Validator.validateDigits?
 * Pressing "Lock In" with an invalid timer or intention shouldn't reveal the Reset Button CHECK
+* Entering a valid intention has revealed some initialization logic flaws:
+    * The Start Button shouldn't say "Lock In", it should say "Continue"
+    * The Reset button should be visible!
 
 UX improvements:
 * Have everything else not "jump up" and cause visual whiplash as the Reset timer is shown CHECK
