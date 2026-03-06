@@ -142,7 +142,7 @@ const TimerEngine = {
 
         // I'd like to believe that we can mash all validation here
         if (validatedIntention !== null) {
-            errorMessage.classList.toggle('invisible');
+            errorMessage.classList.remove('invisible'); // Brain chemistry altering: this one should NOT be toggle! Upon repeated invalid input, the error message would toggle rather than being static and standing its ground!
             errorMessage.textContent = validatedIntention;
             return;
         } 
