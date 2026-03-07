@@ -229,6 +229,7 @@ const TimerEngine = {
         intentionEnd.hidden = true;
         resetBtn.classList.add('invisible'); // UPDATE: Use invisible class instead of hidden property
         startBtn.textContent = "Lock In";
+        intentionInput.focus(); // UPDATE: Auto-focus on the Intention Input!
     },
 
     haltBrowserAPI() {
