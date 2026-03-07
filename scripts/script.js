@@ -289,6 +289,7 @@ timeDisplay.addEventListener('keydown', (e) => {
         e.preventDefault();
     }
 
+    // Here's where we're gonna tinker
     // Special case: If they hit "Enter", we want to stop editing
     if (e.key === 'Enter') {
         e.preventDefault(); // Stop Enter's default behavior of creating a new line. I didn't even realize this was a problem yesterday!
