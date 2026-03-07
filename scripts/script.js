@@ -289,11 +289,16 @@ timeDisplay.addEventListener('keydown', (e) => {
         e.preventDefault();
     }
 
-    // Here's where we're gonna tinker
     // Special case: If they hit "Enter", we want to stop editing
+    // UPDATE: We also want to be able to start the timer with Enter!
     if (e.key === 'Enter') {
-        e.preventDefault(); // Stop Enter's default behavior of creating a new line. I didn't even realize this was a problem yesterday!
-        timeDisplay.blur(); // Remove focus from the element
+        if (document.activeElement !== timeDisplay && document.activeElement !== intentionInput) {
+            TimerEngine.start();
+        } else {
+            e.preventDefault(); // Stop Enter's default behavior of creating a new line. I didn't even realize this was a problem yesterday!
+            timeDisplay.blur(); 
+            intentionInput.blur(); // UPDATE: Remove focus from BOTH elements
+        }
     }
 });
 
