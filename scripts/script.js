@@ -148,6 +148,10 @@ const TimerEngine = {
             return;
         } 
 
+        // NEW: Calculate the absolute end time based on the hardware clock
+        // Date.now() gives current ms. totalSeconds * 1000 converts our remaining time to ms.
+        StateBuffer.endTime = Date.now() + (StateBuffer.totalSeconds * 1000);
+
         // 2. Lock the buffer! We don't want the user to be able to edit anything 
         // while the timer is running
         timeDisplay.setAttribute("contenteditable", "false");
