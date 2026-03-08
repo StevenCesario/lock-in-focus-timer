@@ -15,6 +15,7 @@ const StateBuffer = {
     isRunning: false,
     intervalId: null,
     intentionEndScreen: false,
+    endTime: null // NEW: The absolute Unix timestamp the timer *should* end
 }
 
 // VIEW RENDERER (Our "Mirror")
