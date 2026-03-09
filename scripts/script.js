@@ -45,7 +45,7 @@ const ViewRenderer = {
 
 // VALIDATOR
 const Validator = {
-    // UpdatedRule: At least 5 *letters*
+    // Updated rule: At least 5 *letters*!
     validateIntention(intention) {
         const cleanIntention = intention.trim();
 
@@ -60,10 +60,11 @@ const Validator = {
         return null; // No error
     },
 
-    // To be implemented
-    // Rule: ?
-    validateDigits(digits) {
-        // To be added
+    // Rule: Simply catch "The Zero Case"! Ensure the engine never starts with 0 or negative digits!
+    validateDigits(seconds) {
+        if (seconds <= 0) {
+            return "Timer must be set to at least 1 second.";
+        }
         return null;
     },
 
