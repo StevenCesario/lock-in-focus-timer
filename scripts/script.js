@@ -247,6 +247,7 @@ const TimerEngine = {
         resetBtn.classList.add('invisible'); // UPDATE: Use invisible class instead of hidden property
         startBtn.textContent = "Lock In";
         intentionInput.focus(); // UPDATE: Auto-focus on the Intention Input!
+        intentionInput.style.height = ''; // UPDATE: Snap the textarea back to exactly 1 row!
     },
 
     haltBrowserAPI() {
@@ -398,7 +399,12 @@ resetBtn.addEventListener('click', () => {
 const localStorageSeconds = StorageManager.load(StorageManager.SECONDS_KEY);
 const localStorageIntention = StorageManager.load(StorageManager.INTENTION_KEY);
 
-// TODO: We need to change some stuff around here to ensure the logic is sound
+// // NEW: Make sure that we don't have more than 1 rows in the intention 
+// // input upon initialization if it was auto-stretched at an earlier moment
+// // We're stripping away any lingering inline heights from browser caching
+// intentionInput.style.height = ''; 
+
+// TODO: We need to change some stuff around here to ensure the logic is sound?
 if (localStorageSeconds !== null) {
     // If it's not null, it means that there is seconds saved. Update the StateBuffer to use it!
     StateBuffer.totalSeconds = localStorageSeconds;

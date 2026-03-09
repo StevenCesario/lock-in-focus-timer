@@ -2553,3 +2553,76 @@ When you load the page, the HTML `rows="1"` sets the **initial perfect baseline.
 Drop this Event Listener into your script! Does your intention input now breathe and flex exactly as the user requires?
 
 Once you verify this smooth expansion, would you like to tackle making the two buttons uniform in width, or dive into those Initialization refactoring thoughts you mentioned? 🌱
+
+
+I completely understand the bug, and your screenshot perfectly illustrates it!
+
+You are looking at _the "ghost" of a previous session_. **The text has been cleared, but the bottom border is hanging way down, leaving a massive, awkward gap below the placeholder.**
+
+Here is exactly what is happening under the hood, why your initialization attempt didn't work, and how to fix it with a single, elegant line of code.
+
+## Node 1: The Physics of "Inline Styles"
+
+When your auto-expand Event Listener runs, it executes this line: `intentionInput.style.height = intentionInput.scrollHeight + 'px';`
+
+What this actually does in the browser is inject an **Inline Style** directly into the HTML tag. Your DOM suddenly looks like this: `<textarea id="intention-input" style="height: 64px;" ...></textarea>`
+
+**The Root Cause:** When you clear the text (either by refreshing the page where the browser aggressively remembers form states, or by hitting your Reset button), the text disappears. **==_But the inline style is still there._==** The browser is strictly following orders: "Keep this box 64px tall, even if it's empty."
+
+## Node 2: Why your Initialization fix failed
+
+You tried to use the auto-expand logic in the Initialization block:
+
+```
+intentionInput.style.height = 'auto';
+intentionInput.style.height = intentionInput.scrollHeight + 'px';
+```
+
+This fails for two pragmatic reasons:
+
+1. **The Placeholder Anomaly:** **When a textarea is empty, `scrollHeight` can sometimes calculate the height of the _placeholder text_ or the default padding, rather than shrinking to true zero.**
+    
+2. **The Execution Timing:** **During the very first millisecond of page load, the browser hasn't fully painted the CSS Flexbox layout. If you ask for `scrollHeight` before the paint is finished, it returns an inaccurate number, permanently locking your textarea to a weird height.**
+    
+
+## The Pragmatic Fix: The "Style Teardown"
+
+**==Instead of trying to _recalculate_ the height of an empty box, we just need to _delete_ the inline style and give control back to your CSS and your `rows="1"` attribute.==**
+
+**In JavaScript, you remove an inline style by setting it to an empty string.**
+
+**1. Update Initialization:** Replace your two lines in the Initialization block with this single line:
+
+```
+// NEW: Strip away any lingering inline heights from browser caching
+intentionInput.style.height = ''; 
+```
+
+**2. Update the Reset Method!** You also need to add this to `TimerEngine.reset()`. Right now, when a user clicks the Reset button, your code clears the value (`intentionInput.value = "";`), but it leaves the inline height intact!
+
+Add it to your manual DOM reset list:
+
+```
+    reset() {
+        this.haltBrowserAPI();
+        StorageManager.clearSession();
+        
+        // Manual full DOM reset
+        timeDisplay.textContent = "45:00";
+        StateBuffer.totalSeconds = 2700;
+        timeDisplay.setAttribute("contenteditable", "true");
+        intentionInput.value = "";
+        
+        // NEW: Snap the textarea back to exactly 1 row!
+        intentionInput.style.height = ''; 
+        
+        intentionInput.disabled = false;
+        // ... (rest of your reset logic)
+    }
+```
+
+## The Synthesis
+
+**By setting `style.height = ''`, you are telling the DOM: _"Forget whatever custom height JS gave you earlier. Go back to following the rules in `style.css` and the HTML `rows` attribute."_ It instantly snaps back to a tight, single-line input.**
+
+Implement that empty string assignment. Does the "ghost gap" finally vanish on both page reload and Reset? 🚀
