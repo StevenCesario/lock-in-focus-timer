@@ -2489,3 +2489,67 @@ Update your existing `.intention-input` CSS class with these two additions:
 Because you used `id="intention-input"` and `class="intention-input"`, your JavaScript DOM pointers and your CSS selectors will instantly attach to the new `<textarea>` without you needing to rewrite a single line of your engine logic. `.value`, `.disabled`, and `.blur()` all work identically on a `<textarea>`.
 
 Swap out the HTML node and drop in those two CSS properties. Do your longer intentions wrap beautifully to a second line now?
+
+
+This is the ultimate frontend developer rite of passage! You have just encountered the **"==Textarea Row Paradox==."**
+
+**It is incredibly frustrating. If you hardcode `rows="2"`, you are pre-allocating memory (screen space) for two lines, even if the user only types one. It looks top-heavy and strange. If you hardcode `rows="1"`, you set a strict "Visual Floor," and when the text wraps, it falls beneath that floor, resulting in the top half of the letters getting decapitated.**
+
+You absolutely can have your cake and eat it too. We are going to build an **==Auto-Expanding Textarea==**.
+
+## Node 1: The Limitations of Native CSS
+
+Historically, CSS has been "blind" to how much text is inside a `<textarea>`. It can only follow strict rules: "Be 50px tall" or "Be exactly 1 row tall."
+
+**==_To get a box that starts as 1 row but elastically stretches to 2 or 3 rows the exact millisecond the text wraps, we need to bridge the gap between the View (CSS) and the Content (The text). We do this by tapping into the DOM's physical geometry via JavaScript._==**
+
+## Node 2: The Geometry of `scrollHeight`
+
+Every DOM element has a hidden property called `scrollHeight`. This number represents the total physical height of the content _inside_ the box, even if that content has spilled below the visible floor.
+
+**The Logic:**
+
+1. Whenever the user types a letter, we reset the box's height to `auto` (shrinking it to its minimum size).
+    
+2. We immediately ask the browser: "How tall is the text right now?" (`scrollHeight`).
+    
+3. We inject that exact pixel value directly into the element's inline CSS style.
+    
+
+## The Implementation
+
+**1. The HTML** Keep your `<textarea>`, but confidently set it back to `rows="1"`.
+
+```
+<textarea 
+    id="intention-input" 
+    class="intention-input" 
+    placeholder="e.g., Complete the first 3 test exam exercises"
+    autocomplete="off"
+    spellcheck="false"
+    rows="1"
+></textarea>
+```
+
+**2. The JavaScript** Add this event listener right alongside your other `intentionInput.addEventListener('keydown', ...)` block. Note that we are listening for the `'input'` event, which fires every single time the content changes (typing, pasting, deleting).
+
+```
+// AUTO-EXPANDING TEXTAREA LOGIC
+intentionInput.addEventListener('input', () => {
+    // 1. Reset the height to 'auto' to allow shrinking if the user deletes text
+    intentionInput.style.height = 'auto';
+    
+    // 2. Dynamically allocate the exact vertical space needed using scrollHeight
+    intentionInput.style.height = intentionInput.scrollHeight + 'px';
+});
+```
+
+## The Socratic Trace
+
+When you load the page, the HTML `rows="1"` sets the **initial perfect baseline.** As you type a long intention and reach the edge of the container, the `'input'` event fires. **The browser calculates that the text just wrapped, increasing the `scrollHeight`. Your script instantly applies that new height to the CSS. ==The box seamlessly stretches downward without a single scrollbar in sight.==**
+
+**==When you backspace and delete the second line, the height resets to `auto`, recalculates the now-smaller `scrollHeight`, and snaps back up to a single row.==**
+
+Drop this Event Listener into your script! Does your intention input now breathe and flex exactly as the user requires?
+
+Once you verify this smooth expansion, would you like to tackle making the two buttons uniform in width, or dive into those Initialization refactoring thoughts you mentioned? 🌱
