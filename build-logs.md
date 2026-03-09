@@ -2626,3 +2626,64 @@ Add it to your manual DOM reset list:
 **By setting `style.height = ''`, you are telling the DOM: _"Forget whatever custom height JS gave you earlier. Go back to following the rules in `style.css` and the HTML `rows` attribute."_ It instantly snaps back to a tight, single-line input.**
 
 Implement that empty string assignment. Does the "ghost gap" finally vanish on both page reload and Reset? 🚀
+
+
+This is the final boss of UI logic, and your frustration is completely justified! You are experiencing the classic **"==Hydration Desync==."** Let's look at the "Physics" of why it works when you type, but clips when you refresh.
+
+## Node 1: The "Silent Delivery"
+
+Think about how our auto-expand feature works: we attached a "Microphone" that listens for the `'input'` event (which fires every time a human presses a key).
+
+When you refresh the page, your Initialization logic says: `intentionInput.value = localStorageIntention;`
+
+**The Root Cause:** **==When JavaScript programmatically shoves text into an element using `.value`, it does so _silently_. It bypasses the keyboard entirely, which means the browser never fires the `'input'` event.==**
+
+**Because the event never fires, your auto-expand logic never runs. The textarea receives 3 lines of text, but strictly obeys its `rows="1"` HTML constraint, creating that terrible clipping effect.**
+
+## Node 2: The Synthetic Event Protocol
+
+**You don't need to duplicate the height-calculation logic in your Initialization block. _==We just need to force the browser to "ping" the microphone we already built.==_**
+
+In JavaScript, we can create and dispatch **==Synthetic Events==**. **==We can literally tell the DOM: _"Pretend the user just typed something right now."_==**
+
+## The Pragmatic Fix
+
+Go to your **Initialization** block. Find where you load the `localStorageIntention` into the `.value`. **Right after you inject the text, dispatch the event to force the resize, ==_before_ you disable the input!==**
+
+```
+if (localStorageIntention !== null) {
+    intentionPrompt.hidden = true;
+    intentionActive.hidden = false;
+
+    // 1. Inject the text (Silent Delivery)
+    intentionInput.value = localStorageIntention;
+
+    // 2. NEW: Manually fire the microphone to force the auto-expand calculation!
+    intentionInput.dispatchEvent(new Event('input'));
+
+    // 3. Lock the hardware
+    intentionInput.disabled = true;
+
+    startBtn.textContent = "Continue";
+    resetBtn.classList.remove('invisible');
+}
+```
+
+**_(Note: Keep the `intentionInput.style.height = '';` inside your `reset()` method, as that is still the perfect way to wipe the inline styles when clearing the board manually!)_**
+
+## The Socratic Trace
+
+When the page reloads:
+
+1. JS grabs your long intention from storage.
+    
+2. It drops it into the `<textarea>`.
+    
+3. **==`dispatchEvent` rings the bell.==**
+    
+4. Your existing event listener wakes up, sets the height to `auto`, calculates the new `scrollHeight` of your long text, and stretches the box perfectly.
+    
+5. The box is then safely disabled and locked.
+    
+
+Drop that `dispatchEvent` line in. Does your text hydrate and wrap perfectly on a fresh page load now?
