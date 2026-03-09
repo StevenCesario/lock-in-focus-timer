@@ -68,15 +68,20 @@ const Validator = {
         return null;
     },
 
-    // A helper to check both at once
-    validateInput(digits, intention) {
-        const digitsError = this.validateDigits(digits);
-        if (digitsError) return digitsError;
+    // A helper to check both at once; Our "Gatekeepeer"
+    validateInput(rawDigits, rawIntention) {
+        // 1. Parse the digits
+        const parsedSeconds = TimeParser.parseToSeconds(rawDigits);
 
-        const intentionError = this.validateIntention(intention);
-        if (intentionError) return intentionError;
+        // 2. Validate the logic
+        const digitsError = this.validateDigits(parsedSeconds);
+        if (digitsError) return { isValid: false, error: digitsError };
 
-        return null; // Both are valid!
+        const intentionError = this.validateIntention(rawIntention);
+        if (intentionError) return { isValid: false, error: intentionError };
+
+        // Step 3: Return the clean, validated data!
+        return { isValid: true, seconds: parsedSeconds };
     }
 }
 
