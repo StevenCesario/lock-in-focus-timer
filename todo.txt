@@ -16,9 +16,9 @@ Bugs:
 * At least 3 characters for the intention CHECK
 * Upgrade the intention validation rule to at least 5 *letters* CHECK
     Digits validation:
-    * Preventing more than two numbers on either side of the colon?
-    * Do we parse or validate the digits first?
-    * Move `if (StateBuffer.totalSeconds <= 0) return;` to Validator.validateDigits?
+    * Preventing more than two numbers on either side of the colon? CHECK
+    * Do we parse or validate the digits first? CHECK
+    * Move `if (StateBuffer.totalSeconds <= 0) return;` to Validator.validateDigits? CHECK
 * Pressing "Lock In" with an invalid timer or intention shouldn't reveal the Reset Button CHECK
 * Entering a valid intention has revealed some initialization logic flaws:
     * The Start Button shouldn't say "Lock In", it should say "Continue" CHECK
@@ -31,10 +31,13 @@ UX improvements:
 * Remove the visual whiplash that has been re-introduced with the error message haha CHECK
 * If there is no blur on the timeDisplay and the user hits Enter again, start the timer CHECK
 * timeDisplay.blur(); Do the opposite of this; Add focus to ther timer upon initialization CHECK (but on intentionInput and not timeDisplay haha, see PR #14)
-* Make the two buttons the same width regardless what mode we're in
-* Smooth transitions when the text is changed and the second button is shown
 * Warning message: "It is recommended to keep your focus sessions to 60 minutes or less per session" if minutes is > 60 CHECK
 * Should we spell out the rule? Or is "Please enter a valid intention" enough? CHECK
+* Have longer intentions not "clip"
+
+UX polishes:
+* Make the two buttons the same width regardless what mode we're in
+* Smooth transitions when the text is changed and the second button is shown
 
 Refactoring:
 * Initialization; see comment in PR #12
