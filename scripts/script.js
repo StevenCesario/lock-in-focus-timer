@@ -419,8 +419,13 @@ if (localStorageIntention !== null) {
     intentionPrompt.hidden = true;
     intentionActive.hidden = false;
 
-    // Show the locked intention that is stored in localStorage!
+    // Show the locked intention that is stored in localStorage
     intentionInput.value = localStorageIntention;
+
+    // NEW: Manually fire the microphone to force the auto-expand calculation!
+    intentionInput.dispatchEvent(new Event('input'));
+
+    // This stays the same, we still want to lock the input
     intentionInput.disabled = true;
 
     // I will just chuck the button logic here for now. Refactoring to be made later, I will just make something functional now
