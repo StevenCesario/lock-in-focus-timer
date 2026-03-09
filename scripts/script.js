@@ -313,7 +313,16 @@ timeDisplay.addEventListener('keydown', (e) => {
     }
 });
 
-// OTHER EVENTS LISTENERS
+// AUTO-EXPANDING TEXTAREA LOGIC
+intentionInput.addEventListener('input', () => {
+    // 1. Reset the height to 'auto' to allow shrinking if the user deletes text
+    intentionInput.style.height = 'auto';
+    
+    // 2. Dynamically allocate the exact vertical space needed using scrollHeight
+    intentionInput.style.height = intentionInput.scrollHeight + 'px';
+});
+
+// PRE-LOCK IN WARNING MESSAGE LOGIC
 timeDisplay.addEventListener('blur', () => {
     // Here is where this logic lives! Not in TimerEngine.start()! We want this to happen
     // *before* the user hits "Lock In", the second timerDisplay is not the activeElement
@@ -335,6 +344,7 @@ timeDisplay.addEventListener('blur', () => {
 
 })
 
+// OTHER EVENTS LISTENERS
 intentionInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
         intentionInput.blur();
@@ -345,7 +355,7 @@ intentionInput.addEventListener('keydown', (e) => {
         //     intentionInput.blur(); // Blur only if there is no error in the intention input! 
         // }
         // I can't implement this right now, I'm missing something. I'll return to this
-        // But you could also arugu that the UX is *better* by removing the focus every
+        // But you could also argue that the UX is *better* by removing the focus every
         // time there is an invalid input to further highlight that it is actually being
         // validated and that the error message has been *generated* rather than that it 
         // is stuck in place
